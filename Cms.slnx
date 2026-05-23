@@ -1,0 +1,17 @@
+<Solution>
+  <Folder Name="/Api/">
+    <Project Path="Api/Cms.Api/Cms.Api.csproj" />
+  </Folder>
+  <Folder Name="/Application/">
+    <Project Path="Application/Cms.Application/Cms.Application.csproj" />
+  </Folder>
+  <Folder Name="/Domain/">
+    <Project Path="Domain/Cms.Domain/Cms.Domain.csproj" />
+  </Folder>
+  <Folder Name="/Infrastructure/">
+    <Project Path="Infrastructure/Cms.Infrastructure/Cms.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/Shared/">
+    <Project Path="Shared/Cms.Shared/Cms.Shared.csproj" />
+  </Folder>
+</Solution>
