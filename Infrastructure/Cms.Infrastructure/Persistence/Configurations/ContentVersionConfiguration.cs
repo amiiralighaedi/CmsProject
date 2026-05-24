@@ -1,6 +1,4 @@
-﻿// ContentVersionConfiguration.cs
-
-using Cms.Domain.Content.ContentItems;
+﻿using Cms.Domain.Content.ContentItems;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

@@ -18,6 +18,8 @@ public static class DependencyInjection
         services.AddDbContext<ApplicationDbContext>(opt =>
         {
             opt.UseNpgsql(connectionString);
+            opt.EnableSensitiveDataLogging();
+            opt.LogTo(Console.WriteLine);
         });
 
         services.AddScoped<IContentTypeRepository, ContentTypeRepository>();

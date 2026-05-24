@@ -10,7 +10,8 @@ public class ContentVersion
     public DateTime CreateAt { get; private set; }
 
     private readonly List<ContentFieldValue> _values = new();
-    public IReadOnlyList<ContentFieldValue> Values => _values.AsReadOnly();
+    //public IReadOnlyList<ContentFieldValue> Values => _values.AsReadOnly();
+     public IReadOnlyCollection<ContentFieldValue> Values => _values;
 
     private ContentVersion() { }
 

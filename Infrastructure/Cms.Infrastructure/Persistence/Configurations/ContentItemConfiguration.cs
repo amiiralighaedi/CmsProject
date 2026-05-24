@@ -1,6 +1,4 @@
-﻿// ContentItemConfiguration.cs
-
-using Cms.Domain.Content.ContentItems;
+﻿using Cms.Domain.Content.ContentItems;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -24,6 +22,9 @@ public class ContentItemConfiguration : IEntityTypeConfiguration<ContentItem>
             .IsRequired();
 
         builder.Property(x => x.UpdatedAt);
+
+        builder.Navigation(x => x.Versions)
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
 
         builder.OwnsMany(x => x.Values, values =>
         {

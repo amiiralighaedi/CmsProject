@@ -20,7 +20,12 @@ public class PublishContentItemCommandHandler : IRequestHandler<PublishContentIt
         if (item == null)
             throw new Exception("Content Item not found");
 
-        item.Publish();
+        var version = item.Publish();
+
+        if (version != null)
+        {
+            await _itemRepo.AddVersionAsync(version);
+        }
 
         await _itemRepo.SaveChangesAsync();
 

@@ -9,10 +9,12 @@ public class ContentItem : BaseEntity, IAggregateRoot
     public Guid ContentTypeId { get; private set; }
 
     private readonly List<ContentFieldValue> _values = new();
-    public IReadOnlyList<ContentFieldValue> Values => _values.AsReadOnly();
+    //public IReadOnlyList<ContentFieldValue> Values => _values.AsReadOnly();
+    public IReadOnlyCollection<ContentFieldValue> Values => _values;
 
     private readonly List<ContentVersion> _versions = new();
-    public IReadOnlyList<ContentVersion> Versions => _versions.AsReadOnly();
+    //public IReadOnlyList<ContentVersion> Versions => _versions.AsReadOnly();
+    public IReadOnlyCollection<ContentVersion> Versions => _versions;
 
     public ContentStatus Status { get; private set; }
 
@@ -44,16 +46,33 @@ public class ContentItem : BaseEntity, IAggregateRoot
         UpdatedAt = DateTime.UtcNow;
     }
 
-    public void Publish()
+    //public void Publish()
+    //{
+    //    if (Status == ContentStatus.Published)
+    //        return;
+
+    //    Status = ContentStatus.Published;
+
+    //    var version = ContentVersion.Create(this);
+    //    _versions.Add(version);
+    //    UpdatedAt = DateTime.UtcNow;
+
+
+    //}
+    public ContentVersion? Publish()
     {
         if (Status == ContentStatus.Published)
-            return;
+            return null;
 
         Status = ContentStatus.Published;
 
         var version = ContentVersion.Create(this);
+
         _versions.Add(version);
+
         UpdatedAt = DateTime.UtcNow;
+
+        return version;
     }
 
     public void RollbackToVersion(int versionNumber)

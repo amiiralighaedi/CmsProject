@@ -1,5 +1,4 @@
-﻿// ContentItemRepository.cs
-using Cms.Application.Content.Interfaces;
+﻿using Cms.Application.Content.Interfaces;
 using Cms.Domain.Content.ContentItems;
 using Cms.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +17,11 @@ public class ContentItemRepository : IContentItemRepository
     public async Task AddAsync(ContentItem contentItem)
     {
         await _dbContext.ContentItems.AddAsync(contentItem);
+    }
+
+    public async Task AddVersionAsync(ContentVersion version)
+    {
+        await _dbContext.Set<ContentVersion>().AddAsync(version);
     }
 
     public async Task<ContentItem?> GetByIdAsync(Guid id)
@@ -41,6 +45,8 @@ public class ContentItemRepository : IContentItemRepository
 
     public async Task SaveChangesAsync()
     {
+        Console.WriteLine(_dbContext.ChangeTracker.DebugView.LongView);
+
         await _dbContext.SaveChangesAsync();
     }
 }
