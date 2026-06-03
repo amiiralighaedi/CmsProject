@@ -1,5 +1,6 @@
 ﻿using Cms.Domain.Content.ContentItems;
 using Cms.Domain.Content.ContentTypes;
+using Cms.Domain.Media.MediaItems;
 using Cms.Infrastructure.Persistence.Configurations;
 using Cms.Shared.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +14,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<ContentType> ContentTypes => Set<ContentType>();
     public DbSet<ContentItem> ContentItems => Set<ContentItem>();
     public DbSet<ContentVersion> ContentVersions => Set<ContentVersion>();
+    public DbSet<MediaItem> MediaItems => Set<MediaItem>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
