@@ -1,6 +1,10 @@
 ﻿// DependencyInjection.cs
 using Cms.Application.Content.Interfaces;
+using Cms.Application.Media.Interfaces;
+using Cms.Application.Media.Interfacesp;
 using Cms.Infrastructure.Content.Repositories;
+using Cms.Infrastructure.Media.Repositories;
+using Cms.Infrastructure.Media.Services;
 using Cms.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -24,6 +28,9 @@ public static class DependencyInjection
 
         services.AddScoped<IContentTypeRepository, ContentTypeRepository>();
         services.AddScoped<IContentItemRepository, ContentItemRepository>();
+        services.AddScoped<IMediaRepository, MediaRepository>();
+        services.AddScoped<IMediaReadRepository, MediaReadRepository>();
+        services.AddScoped<IFileStorageService, FileStorageService>();
 
         return services;
     }
