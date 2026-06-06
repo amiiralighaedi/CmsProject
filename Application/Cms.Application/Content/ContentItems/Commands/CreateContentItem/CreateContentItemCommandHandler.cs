@@ -57,7 +57,7 @@ public class CreateContentItemCommandHandler : IRequestHandler<CreateContentItem
             }
         }
 
-        var item = ContentItem.Create(request.ContentTypeId);
+        var item = ContentItem.Create(request.ContentTypeId, request.Slug);
 
         if (!string.IsNullOrWhiteSpace(request.Title))
             item.AddValue(new ContentFieldValue("Title", request.Title));

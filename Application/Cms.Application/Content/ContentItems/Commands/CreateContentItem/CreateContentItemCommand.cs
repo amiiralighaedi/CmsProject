@@ -7,6 +7,7 @@ namespace Cms.Application.Content.ContentItems.Commands.CreateContentItem;
 
 public record CreateContentItemCommand(
     Guid ContentTypeId,
+    string Slug,
     string? Title,
     List<ContentFieldValueDto>? Values
     ) : IRequest<Guid>;
