@@ -31,6 +31,7 @@ public static class DependencyInjection
         services.AddScoped<IMediaRepository, MediaRepository>();
         services.AddScoped<IMediaReadRepository, MediaReadRepository>();
         services.AddScoped<IFileStorageService, FileStorageService>();
+        services.AddScoped<IContentQueryRepository, ContentQueryRepository>();
 
         return services;
     }

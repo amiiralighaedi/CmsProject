@@ -1,19 +1,23 @@
-﻿// ContentItem.cs
-using Cms.Shared.Domain.Entities;
+﻿using Cms.Shared.Domain.Entities;
+using Cms.Domain.Content.ContentTypes;
 
 namespace Cms.Domain.Content.ContentItems;
 
 public class ContentItem : BaseEntity, IAggregateRoot
 {
     public Guid Id { get; private set; }
+
+    // ارتباط با ContentType
     public Guid ContentTypeId { get; private set; }
+    public ContentType ContentType { get; private set; } = default!;
+
+    // Slug برای URL
+    public string Slug { get; private set; } = default!;
 
     private readonly List<ContentFieldValue> _values = new();
-    //public IReadOnlyList<ContentFieldValue> Values => _values.AsReadOnly();
     public IReadOnlyCollection<ContentFieldValue> Values => _values;
 
     private readonly List<ContentVersion> _versions = new();
-    //public IReadOnlyList<ContentVersion> Versions => _versions.AsReadOnly();
     public IReadOnlyCollection<ContentVersion> Versions => _versions;
 
     public ContentStatus Status { get; private set; }
@@ -23,16 +27,17 @@ public class ContentItem : BaseEntity, IAggregateRoot
 
     private ContentItem() { }
 
-    private ContentItem(Guid id, Guid contentTypeId)
+    private ContentItem(Guid id, Guid contentTypeId, string slug)
     {
         Id = id;
         ContentTypeId = contentTypeId;
+        Slug = slug;
         Status = ContentStatus.Draft;
         CreatedAt = DateTime.UtcNow;
     }
 
-    public static ContentItem Create(Guid contentTypeId)
-        => new(Guid.NewGuid(), contentTypeId);
+    public static ContentItem Create(Guid contentTypeId, string slug)
+        => new(Guid.NewGuid(), contentTypeId, slug);
 
     public void AddValue(ContentFieldValue value)
     {
@@ -46,19 +51,6 @@ public class ContentItem : BaseEntity, IAggregateRoot
         UpdatedAt = DateTime.UtcNow;
     }
 
-    //public void Publish()
-    //{
-    //    if (Status == ContentStatus.Published)
-    //        return;
-
-    //    Status = ContentStatus.Published;
-
-    //    var version = ContentVersion.Create(this);
-    //    _versions.Add(version);
-    //    UpdatedAt = DateTime.UtcNow;
-
-
-    //}
     public ContentVersion? Publish()
     {
         if (Status == ContentStatus.Published)
@@ -67,7 +59,6 @@ public class ContentItem : BaseEntity, IAggregateRoot
         Status = ContentStatus.Published;
 
         var version = ContentVersion.Create(this);
-
         _versions.Add(version);
 
         UpdatedAt = DateTime.UtcNow;

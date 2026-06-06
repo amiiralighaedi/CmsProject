@@ -30,7 +30,9 @@ public class ContentItemsController : ControllerBase
         var command = new CreateContentItemCommand(
             request.ContentTypeId,
             request.Title,
+            request.Slug,
             request.Values
+
             .Select(v => new ContentFieldValueDto(v.FieldName, v.Value))
             .ToList()
             );

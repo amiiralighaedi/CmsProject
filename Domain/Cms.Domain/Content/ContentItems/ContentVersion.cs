@@ -7,11 +7,18 @@ public class ContentVersion
     public ContentItem ContentItem { get; private set; }
 
     public int VersionNumber { get; private set; }
+
+    // تاریخ ایجاد نسخه
     public DateTime CreateAt { get; private set; }
 
+    // آیا این نسخه منتشر شده؟
+    public bool IsPublished { get; private set; }
+
+    // تاریخ انتشار نسخه
+    public DateTime? PublishedAt { get; private set; }
+
     private readonly List<ContentFieldValue> _values = new();
-    //public IReadOnlyList<ContentFieldValue> Values => _values.AsReadOnly();
-     public IReadOnlyCollection<ContentFieldValue> Values => _values;
+    public IReadOnlyCollection<ContentFieldValue> Values => _values;
 
     private ContentVersion() { }
 
@@ -21,6 +28,10 @@ public class ContentVersion
         ContentItemId = contentItemId;
         VersionNumber = versionNumber;
         CreateAt = DateTime.UtcNow;
+
+        // نسخه‌ای که ساخته می‌شود، نسخه منتشر شده است
+        IsPublished = true;
+        PublishedAt = DateTime.UtcNow;
     }
 
     public static ContentVersion Create(ContentItem item)
