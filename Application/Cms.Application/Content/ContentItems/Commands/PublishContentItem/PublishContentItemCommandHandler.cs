@@ -1,5 +1,6 @@
 ﻿
 
+using Cms.Application.Common.Interfaces;
 using Cms.Application.Content.Interfaces;
 using MediatR;
 
@@ -8,10 +9,12 @@ namespace Cms.Application.Content.ContentItems.Commands.PublishContentItem;
 public class PublishContentItemCommandHandler : IRequestHandler<PublishContentItemCommand, Unit>
 {
     private readonly IContentItemRepository _itemRepo;
+    private readonly ICacheService _cacheService;
 
-    public PublishContentItemCommandHandler(IContentItemRepository itemRepo)
+    public PublishContentItemCommandHandler(IContentItemRepository itemRepo, ICacheService cacheService)
     {
         _itemRepo = itemRepo;
+        _cacheService = cacheService;
     }
 
     public async Task<Unit> Handle(PublishContentItemCommand request, CancellationToken cancellationToken)
@@ -28,6 +31,10 @@ public class PublishContentItemCommandHandler : IRequestHandler<PublishContentIt
         }
 
         await _itemRepo.SaveChangesAsync();
+
+        await _cacheService.DeleteAsync($"content:item:{item.ContentType.Slug}:{item.Id}");
+        await _cacheService.DeleteAsync($"content:slug:{item.ContentType.Slug}:{item.Slug}");
+        await _cacheService.DeleteAsync($"content:list:{item.ContentType.Slug}:*");
 
         return Unit.Value;
     }

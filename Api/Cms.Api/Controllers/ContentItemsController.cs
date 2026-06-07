@@ -53,6 +53,7 @@ public class ContentItemsController : ControllerBase
     {
         var command = new UpdateContentItemCommand(
             id,
+            null, // title
             request.Values.Select(v => new UpdateFieldValueDto(v.FieldName, v.Values)).ToList()
         );
 

@@ -1,4 +1,5 @@
 ﻿
+using Cms.Application.Common.Interfaces;
 using Cms.Application.Content.Interfaces;
 using Cms.Domain.Content.ContentTypes;
 using MediatR;
@@ -8,12 +9,14 @@ namespace Cms.Application.Content.ContentItems.Commands.UpdateContentItem;
 public class UpdateContentItemCommandHandler : IRequestHandler<UpdateContentItemCommand, Unit>
 {
     private readonly IContentItemRepository _itemRepo;
+    private readonly ICacheService _cache;
     private readonly IContentTypeRepository _contentRepo;
 
-    public UpdateContentItemCommandHandler(IContentItemRepository itemRepo, IContentTypeRepository contentRepo)
+    public UpdateContentItemCommandHandler(IContentItemRepository itemRepo, IContentTypeRepository contentRepo, ICacheService cache)
     {
         _itemRepo = itemRepo;
         _contentRepo = contentRepo;
+        _cache = cache;
     }
 
     public async Task<Unit> Handle(UpdateContentItemCommand request, CancellationToken cancellationToken)
@@ -67,6 +70,10 @@ public class UpdateContentItemCommandHandler : IRequestHandler<UpdateContentItem
         }
 
         await _itemRepo.SaveChangesAsync();
+
+        await _cache.DeleteAsync($"content:item:{item.ContentType.Slug}:{item.Id}");
+        await _cache.DeleteAsync($"content:slug:{item.ContentType.Slug}:{item.Slug}");
+        await _cache.DeleteAsync($"content:list:{item.ContentType.Slug}:*");
 
         return Unit.Value;
 
