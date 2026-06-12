@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>dotnet-Cms.Worker-1d1efe2b-4f56-47d9-9ab1-b2734d369d00</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.8" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Application\Cms.Application\Cms.Application.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\Cms.Infrastructure\Cms.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>

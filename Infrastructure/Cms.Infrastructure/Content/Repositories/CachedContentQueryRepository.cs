@@ -1,47 +1,49 @@
-﻿
-
-using Cms.Application.Common.Interfaces;
+﻿using Cms.Application.Common.Interfaces;
 using Cms.Application.Content.DTOs;
 using Cms.Application.Content.Interfaces;
-using System.Reflection;
+using Cms.Application.Content.Queries;
 
 namespace Cms.Infrastructure.Content.Repositories;
 
 public class CachedContentQueryRepository : IContentQueryRepository
 {
-    private readonly IContentQueryRepository _contentQueryRepository;
-    private readonly ICacheService _cacheService;
+    private readonly IContentQueryRepository _inner;
+    private readonly ICacheService _cache;
 
-    public CachedContentQueryRepository(IContentQueryRepository contentQueryRepository, ICacheService cacheService)
+    public CachedContentQueryRepository(
+        IContentQueryRepository inner,
+        ICacheService cache)
     {
-        _contentQueryRepository = contentQueryRepository;
-        _cacheService = cacheService;
+        _inner = inner;
+        _cache = cache;
     }
 
     public async Task<ContentItemDto?> GetByIdAsync(string contentType, Guid id)
     {
-        var cacheKey = $"content:item:{contentType}:{id}";
-        var cached = await _contentQueryRepository.GetByIdAsync(contentType, id);
+        var key = $"content:item:{contentType}:{id}";
+
+        var cached = await _cache.GetAsync<ContentItemDto>(key);
         if (cached != null)
             return cached;
-        var res = await _contentQueryRepository.GetByIdAsync(contentType, id);
-        if (res != null)
-            await _cacheService.SetAsync(cacheKey, res);
 
-        return res;
+        var result = await _inner.GetByIdAsync(contentType, id);
+        if (result != null)
+            await _cache.SetAsync(key, result);
+
+        return result;
     }
 
     public async Task<ContentItemDto?> GetBySlugAsync(string contentType, string slug)
     {
         var key = $"content:slug:{contentType}:{slug}";
 
-        var cached = await _cacheService.GetAsync<ContentItemDto>(key);
+        var cached = await _cache.GetAsync<ContentItemDto>(key);
         if (cached != null)
             return cached;
 
-        var result = await _contentQueryRepository.GetBySlugAsync(contentType, slug);
+        var result = await _inner.GetBySlugAsync(contentType, slug);
         if (result != null)
-            await _cacheService.SetAsync(key, result);
+            await _cache.SetAsync(key, result);
 
         return result;
     }
@@ -50,13 +52,26 @@ public class CachedContentQueryRepository : IContentQueryRepository
     {
         var key = $"content:list:{contentType}:{page}:{pageSize}";
 
-        var cached = await _cacheService.GetAsync<List<ContentItemDto>>(key);
+        var cached = await _cache.GetAsync<List<ContentItemDto>>(key);
         if (cached != null)
             return cached;
 
-        var result = await _contentQueryRepository.GetListAsync(contentType, page, pageSize);
-        await _cacheService.SetAsync(key, result);
+        var result = await _inner.GetListAsync(contentType, page, pageSize);
+        await _cache.SetAsync(key, result);
 
         return result;
+    }
+
+    public async Task<QueryResponse<object>> QueryAsync(
+        string contentType,
+        Dictionary<string, string>? filters,
+        string? sort,
+        bool desc,
+        int page,
+        int pageSize)
+    {
+        // ❗ Query API معمولاً cache نمی‌شود
+        // چون فیلترها و sort و search زیاد هستند
+        return await _inner.QueryAsync(contentType, filters, sort, desc, page, pageSize);
     }
 }
