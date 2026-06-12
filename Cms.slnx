@@ -14,4 +14,7 @@
   <Folder Name="/Shared/">
     <Project Path="Shared/Cms.Shared/Cms.Shared.csproj" />
   </Folder>
+  <Folder Name="/Worker/">
+    <Project Path="Worker/Cms.Worker/Cms.Worker.csproj" Id="5e5a7494-c25d-431f-b837-e1ce3da554cd" />
+  </Folder>
 </Solution>

@@ -1,4 +1,5 @@
 ﻿
+using Cms.Application.Common.Events;
 using Cms.Application.Common.Interfaces;
 using Cms.Application.Content.Interfaces;
 using Cms.Domain.Content.ContentTypes;
@@ -11,12 +12,14 @@ public class UpdateContentItemCommandHandler : IRequestHandler<UpdateContentItem
     private readonly IContentItemRepository _itemRepo;
     private readonly ICacheService _cache;
     private readonly IContentTypeRepository _contentRepo;
+    private readonly IEventPublisher _eventPublisher;
 
-    public UpdateContentItemCommandHandler(IContentItemRepository itemRepo, IContentTypeRepository contentRepo, ICacheService cache)
+    public UpdateContentItemCommandHandler(IContentItemRepository itemRepo, IContentTypeRepository contentRepo, ICacheService cache, IEventPublisher eventPublisher)
     {
         _itemRepo = itemRepo;
         _contentRepo = contentRepo;
         _cache = cache;
+        _eventPublisher = eventPublisher;
     }
 
     public async Task<Unit> Handle(UpdateContentItemCommand request, CancellationToken cancellationToken)
@@ -70,6 +73,15 @@ public class UpdateContentItemCommandHandler : IRequestHandler<UpdateContentItem
         }
 
         await _itemRepo.SaveChangesAsync();
+
+        await _eventPublisher.PublishAsync(
+             new ContentUpdateEvent(
+
+            item.Id,
+            item.ContentType.Slug,
+            item.Slug
+        ));
+
 
         await _cache.DeleteAsync($"content:item:{item.ContentType.Slug}:{item.Id}");
         await _cache.DeleteAsync($"content:slug:{item.ContentType.Slug}:{item.Slug}");

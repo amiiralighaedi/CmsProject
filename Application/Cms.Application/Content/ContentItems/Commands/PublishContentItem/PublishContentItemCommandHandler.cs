@@ -1,5 +1,6 @@
 ﻿
 
+using Cms.Application.Common.Events;
 using Cms.Application.Common.Interfaces;
 using Cms.Application.Content.Interfaces;
 using MediatR;
@@ -10,11 +11,13 @@ public class PublishContentItemCommandHandler : IRequestHandler<PublishContentIt
 {
     private readonly IContentItemRepository _itemRepo;
     private readonly ICacheService _cacheService;
+    private readonly IEventPublisher _eventPublisher;
 
-    public PublishContentItemCommandHandler(IContentItemRepository itemRepo, ICacheService cacheService)
+    public PublishContentItemCommandHandler(IContentItemRepository itemRepo, ICacheService cacheService, IEventPublisher eventPublisher)
     {
         _itemRepo = itemRepo;
         _cacheService = cacheService;
+        _eventPublisher = eventPublisher;
     }
 
     public async Task<Unit> Handle(PublishContentItemCommand request, CancellationToken cancellationToken)
@@ -31,6 +34,15 @@ public class PublishContentItemCommandHandler : IRequestHandler<PublishContentIt
         }
 
         await _itemRepo.SaveChangesAsync();
+
+        await _eventPublisher.PublishAsync(
+
+            new ContentPublishedEvent(
+
+                item.Id,
+                item.ContentType.Slug,
+                item.Slug
+            ));
 
         await _cacheService.DeleteAsync($"content:item:{item.ContentType.Slug}:{item.Id}");
         await _cacheService.DeleteAsync($"content:slug:{item.ContentType.Slug}:{item.Slug}");
