@@ -1,7 +1,9 @@
-﻿using Cms.Application.Common.Interfaces;
+﻿using Cms.Application.Auth.Interfaces;
+using Cms.Application.Common.Interfaces;
 using Cms.Application.Content.Interfaces;
 using Cms.Application.Media.Interfaces;
 using Cms.Application.Media.Interfacesp;
+using Cms.Infrastructure.Auth;
 using Cms.Infrastructure.Common.Services;
 using Cms.Infrastructure.Content.Repositories;
 using Cms.Infrastructure.Events;
@@ -40,7 +42,7 @@ public static class DependencyInjection
 
         services.AddScoped<ICacheService, RedisCacheService>();
 
-        //RabbitMQ Connection (خیلی مهم)
+        // RabbitMQ Connection
         services.AddSingleton<IConnection>(sp =>
         {
             var factory = new ConnectionFactory
@@ -51,17 +53,17 @@ public static class DependencyInjection
             return factory.CreateConnection();
         });
 
-        //Elastic Search
+        // Elastic Search
         services.AddSingleton<IElasticClient>(sp =>
         {
-            var settings = new ConnectionSettings(new
-                Uri(configuration.GetConnectionString("ElasticSearch")!)
-                ).DefaultIndex("cms-content");
+            var settings = new ConnectionSettings(
+                new Uri(configuration.GetConnectionString("ElasticSearch")!)
+            ).DefaultIndex("cms-content");
 
             return new ElasticClient(settings);
         });
 
-        //Event Publisher
+        // Event Publisher
         services.AddScoped<IEventPublisher, RabbitMqEventPublisher>();
 
         // Repositories
@@ -72,7 +74,8 @@ public static class DependencyInjection
         services.AddScoped<IFileStorageService, FileStorageService>();
         services.AddScoped<ISearchIndexService, ElasticSearchIndexService>();
 
-
+        // Auth
+        services.AddScoped<IAuthService, AuthService>();
 
         // Query Repository + Cache Decorator
         services.AddScoped<ContentQueryRepository>();
