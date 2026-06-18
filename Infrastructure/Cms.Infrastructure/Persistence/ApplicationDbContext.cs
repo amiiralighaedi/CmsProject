@@ -1,4 +1,5 @@
-﻿using Cms.Domain.Content.ContentItems;
+﻿using Cms.Domain.Auth;
+using Cms.Domain.Content.ContentItems;
 using Cms.Domain.Content.ContentTypes;
 using Cms.Domain.Media.MediaItems;
 using Cms.Infrastructure.Persistence.Configurations;
@@ -15,6 +16,9 @@ public class ApplicationDbContext : DbContext
     public DbSet<ContentItem> ContentItems => Set<ContentItem>();
     public DbSet<ContentVersion> ContentVersions => Set<ContentVersion>();
     public DbSet<MediaItem> MediaItems => Set<MediaItem>();
+    public DbSet<User> Users => Set<User>();
+    public DbSet<Role> Roles => Set<Role>();
+    public DbSet<UserRole> UserRoles => Set<UserRole>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -24,6 +28,9 @@ public class ApplicationDbContext : DbContext
         modelBuilder.ApplyConfiguration(new ContentVersionConfiguration());
         modelBuilder.ApplyConfiguration(new ContentItemConfiguration());
         modelBuilder.ApplyConfiguration(new ContentTypeConfiguration());
+        modelBuilder.ApplyConfiguration(new UserConfiguration());
+        modelBuilder.ApplyConfiguration(new RoleConfiguration());
+        modelBuilder.ApplyConfiguration(new UserRoleConfiguration());
 
         base.OnModelCreating(modelBuilder);
     }

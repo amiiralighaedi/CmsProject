@@ -9,12 +9,14 @@ using Cms.Application.Content.ContentItems.Queries.GetContentItemByVersion;
 using Cms.Application.Content.ContentItems.Queries.GetContentItemVersions;
 using Cms.Application.Content.ContentItems.Queries.ListContentItems;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Cms.Api.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize] // همه باید لاگین باشند
 public class ContentItemsController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -25,17 +27,15 @@ public class ContentItemsController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin,Editor")]
     public async Task<IActionResult> Create([FromBody] CreateContentItemRequest request)
     {
         var command = new CreateContentItemCommand(
             request.ContentTypeId,
             request.Title,
             request.Slug,
-            request.Values
-
-            .Select(v => new ContentFieldValueDto(v.FieldName, v.Value))
-            .ToList()
-            );
+            request.Values.Select(v => new ContentFieldValueDto(v.FieldName, v.Value)).ToList()
+        );
 
         var id = await _mediator.Send(command);
         return Ok(new { Id = id });
@@ -49,11 +49,12 @@ public class ContentItemsController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
+    [Authorize(Roles = "Admin,Editor")]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateContentItemRequest request)
     {
         var command = new UpdateContentItemCommand(
             id,
-            null, // title
+            null,
             request.Values.Select(v => new UpdateFieldValueDto(v.FieldName, v.Values)).ToList()
         );
 
@@ -62,11 +63,10 @@ public class ContentItemsController : ControllerBase
     }
 
     [HttpPost("{id:guid}/publish")]
+    [Authorize(Roles = "Admin,Editor")]
     public async Task<IActionResult> Publish(Guid id)
     {
-        var command = new PublishContentItemCommand(id);
-        await _mediator.Send(command);
-
+        await _mediator.Send(new PublishContentItemCommand(id));
         return Ok();
     }
 
@@ -78,22 +78,14 @@ public class ContentItemsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> List(
-        [FromQuery] Guid? contentTypeId,
-        [FromQuery] int page = 1,
-        [FromQuery] int pageSize = 20
-        )
+    public async Task<IActionResult> List(Guid? contentTypeId, int page = 1, int pageSize = 20)
     {
-        var res = await _mediator.Send(new ListContentItemsQuery(
-            contentTypeId,
-            page,
-            pageSize
-            ));
-
+        var res = await _mediator.Send(new ListContentItemsQuery(contentTypeId, page, pageSize));
         return Ok(res);
     }
 
     [HttpDelete("{id:guid}")]
+    [Authorize(Roles = "Admin,Editor")]
     public async Task<IActionResult> Delete(Guid id)
     {
         await _mediator.Send(new DeleteContentItemCommand(id));
@@ -101,6 +93,7 @@ public class ContentItemsController : ControllerBase
     }
 
     [HttpPost("{id:guid}/rollback/{versionNumber:int}")]
+    [Authorize(Roles = "Admin,Editor")]
     public async Task<IActionResult> Rollback(Guid id, int versionNumber)
     {
         await _mediator.Send(new RollbackContentItemCommand(id, versionNumber));
@@ -111,8 +104,6 @@ public class ContentItemsController : ControllerBase
     public async Task<IActionResult> GetVersion(Guid id, int versionNumber)
     {
         var res = await _mediator.Send(new GetContentItemByVersionQuery(id, versionNumber));
-
         return Ok(res);
     }
-
 }
